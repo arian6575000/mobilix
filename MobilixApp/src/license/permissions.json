@@ -1,0 +1,73 @@
+{
+  "project": {
+    "name": "Mobilix",
+    "code": "mobilix",
+    "platform": "android_apk",
+    "icon": "smartphone",
+    "description": "Mobile shop manager: new and used phones (IMEI), accessories, sales, installments, ledger, accounts and receipts (offline, Android).",
+    "current_version": "0.1.0",
+    "min_supported_version": "0.1.0"
+  },
+  "permission_schema": [
+    {
+      "module": "sales",
+      "label": "Sales",
+      "icon": "receipt",
+      "description": "Selling phones and accessories.",
+      "features": [
+        { "key": "sales.installments", "label": "Installments (Qist)", "description": "Sell on installments with guarantor and due reminders", "default": true },
+        { "key": "sales.exchange", "label": "Exchange / Trade-in", "description": "Take a customer's old phone against a sale", "default": true },
+        { "key": "sales.documents", "label": "Sale Documents", "description": "Attach CNIC photo or any document to a sale", "default": true }
+      ]
+    },
+    {
+      "module": "inventory",
+      "label": "Inventory",
+      "icon": "boxes",
+      "description": "Phones and accessories stock.",
+      "features": [
+        { "key": "inventory.accessories", "label": "Accessories Stock", "description": "Quantity-based accessories with low stock alerts", "default": true },
+        { "key": "inventory.qr", "label": "QR Labels & Scan", "description": "Print QR labels and scan products with the camera", "default": true }
+      ]
+    },
+    {
+      "module": "accounts",
+      "label": "Accounts",
+      "icon": "wallet",
+      "description": "Ledger, expenses and reports.",
+      "features": [
+        { "key": "accounts.ledger", "label": "Party Ledger", "description": "Customer and supplier udhaar, payments, statements", "default": true },
+        { "key": "accounts.expenses", "label": "Expenses", "description": "Shop expense entries", "default": true },
+        { "key": "accounts.reports", "label": "Reports", "description": "Profit, stock value and balance reports", "default": true }
+      ]
+    },
+    {
+      "module": "branches",
+      "label": "Branches",
+      "icon": "store",
+      "description": "More than one shop.",
+      "features": [
+        { "key": "branches.multi", "label": "Multi-branch", "description": "Several branches with stock transfer and consolidated reports", "default": false }
+      ]
+    },
+    {
+      "module": "print",
+      "label": "Printing",
+      "icon": "printer",
+      "description": "Receipts and labels.",
+      "features": [
+        { "key": "print.receipts", "label": "Receipts (PDF / Share)", "description": "PDF and shareable receipts", "default": true },
+        { "key": "print.thermal", "label": "Thermal Printer", "description": "Bluetooth 58/80mm receipts and labels", "default": true }
+      ]
+    },
+    {
+      "module": "backup",
+      "label": "Backup",
+      "icon": "cloud",
+      "description": "Data safety.",
+      "features": [
+        { "key": "backup.export", "label": "Backup & Restore", "description": "Export and restore all data", "default": true }
+      ]
+    }
+  ]
+}

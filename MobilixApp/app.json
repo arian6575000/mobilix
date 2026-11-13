@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "Mobilix",
+    "slug": "mobilix",
+    "scheme": "mobilix",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F6F7F9"
+    },
+    "android": {
+      "package": "com.mobilix.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#4F46E5",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "allowBackup": false,
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Unlock Mobilix with Face ID"
+        }
+      ],
+      [
+        "expo-localization",
+        {
+          "supportsRTL": false
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Scan product QR codes and IMEI, and photograph documents."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Attach documents and photos to sales and purchases.",
+          "cameraPermission": "Photograph documents such as CNIC for a sale."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
