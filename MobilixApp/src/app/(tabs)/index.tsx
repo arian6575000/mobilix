@@ -23,12 +23,12 @@ export default function Home() {
           <Hero label={t('totalBalance')} value={money(d.balance)} hint={t('totalBalanceHint')} />
 
           <Grid>
-            <Tile label={t('todaySales')} value={money(d.todaySales)} />
-            <Tile label={t('todayProfit')} value={money(d.todayProfit)} tone={d.todayProfit > 0 ? 'teal' : undefined} />
-            <Tile label={t('customersOwe')} value={money(d.receivable)} />
-            <Tile label={t('youOwe')} value={money(d.payable)} />
-            <Tile label={t('stockValue')} value={money(d.stockValue)} />
-            <Tile label={t('phonesInStock')} value={d.phonesInStock} />
+            <Tile icon="cart" tone="teal" label={t('todaySales')} value={money(d.todaySales)} />
+            <Tile icon="trending-up" tone="amber" label={t('todayProfit')} value={money(d.todayProfit)} />
+            <Tile icon="arrow-down-circle" tone="amber" label={t('customersOwe')} value={money(d.receivable)} />
+            <Tile icon="arrow-up-circle" tone="red" label={t('youOwe')} value={money(d.payable)} />
+            <Tile icon="cube" tone="indigo" label={t('stockValue')} value={money(d.stockValue)} />
+            <Tile icon="phone-portrait" tone="slate" label={t('phonesInStock')} value={d.phonesInStock} />
           </Grid>
 
           {d.overdueCount > 0 || d.lowStock > 0 ? (

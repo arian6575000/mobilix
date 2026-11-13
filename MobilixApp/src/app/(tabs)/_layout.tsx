@@ -4,7 +4,8 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../ctx/AppContext';
-import { C, FONT, FONT_UR_BOLD } from '../../lib/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { C, FONT, GRAD, FONT_UR_BOLD } from '../../lib/theme';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -12,11 +13,10 @@ type IconName = React.ComponentProps<typeof Ionicons>['name'];
 function ScanButton({ onPress }: { onPress?: (e: any) => void }) {
   return (
     <View style={{ flex: 1, alignItems: 'center' }}>
-      <Pressable onPress={onPress} style={({ pressed }) => ({
-        marginTop: -18, width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
-        backgroundColor: pressed ? C.primaryDark : C.primary, borderWidth: 4, borderColor: C.bg,
-      })}>
-        <Ionicons name="qr-code-outline" size={26} color="#fff" />
+      <Pressable onPress={onPress} style={({ pressed }) => ({ marginTop: -24, opacity: pressed ? 0.9 : 1, borderRadius: 30, borderWidth: 5, borderColor: C.card, elevation: 6, shadowColor: '#3A1FC4', shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } })}>
+        <LinearGradient colors={GRAD} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' }}>
+          <Ionicons name="qr-code-outline" size={25} color="#fff" />
+        </LinearGradient>
       </Pressable>
     </View>
   );
@@ -34,7 +34,7 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: C.faint,
         tabBarLabelStyle: rtl ? { fontFamily: FONT_UR_BOLD, fontSize: 11, lineHeight: 22 } : { fontFamily: FONT.medium, fontSize: 11 },
         tabBarStyle: {
-          backgroundColor: C.card, borderTopColor: C.line, borderTopWidth: 1, elevation: 0,
+          backgroundColor: C.card, borderTopWidth: 0, borderTopLeftRadius: 24, borderTopRightRadius: 24, elevation: 12, shadowColor: '#3A1FC4', shadowOpacity: 0.1, shadowRadius: 12,
           height: 58 + insets.bottom, paddingTop: 6, paddingBottom: Math.max(insets.bottom, 6), flexDirection: rtl ? 'row-reverse' : 'row',
         },
       }}>

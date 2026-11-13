@@ -2,17 +2,17 @@ import { Platform } from 'react-native';
 
 // "Quiet professional": neutral surfaces, ONE accent (indigo). Teal only means money-in / paid, red only means due / overdue.
 export const C = {
-  bg: '#F6F7F9',
+  bg: '#F4F3FB',
   card: '#FFFFFF',
   surface: '#FFFFFF',
-  subtle: '#F1F3F6', // inputs, segmented track, pressed rows
-  line: '#E5E7EB',
+  subtle: '#F0EEFA', // inputs, segmented track, pressed rows
+  line: '#E7E4F5',
   ink: '#0F172A',
   soft: '#475569',
   faint: '#94A3B8',
-  primary: '#4F46E5',
-  primaryDark: '#4338CA',
-  primarySoft: '#EEF0FF',
+  primary: '#4F35E8',
+  primaryDark: '#3B24C2',
+  primarySoft: '#ECE9FF',
   success: '#0D9488',
   successSoft: '#E6F6F4',
   danger: '#DC2626',
@@ -31,7 +31,10 @@ export const TONES = {
 };
 export type Tone = keyof typeof TONES;
 
-export const R = { sm: 10, md: 14, lg: 18, pill: 999 };
+export const R = { sm: 10, md: 14, lg: 20, pill: 999 };
+
+/** Header / hero gradient (deep indigo to violet). */
+export const GRAD = ['#3A1FC4', '#5B3DF2'] as const;
 
 // English: Inter (loaded in the root layout). Urdu: one place to change when the Nastaleeq font file is added.
 export const FONT = {
@@ -45,10 +48,10 @@ export const FONT_UR_BOLD = 'NotoNastaliqUrdu_700Bold';
 // Nastaleeq glyphs are tall: Urdu text needs a larger line height than Latin text.
 export const URDU_LINE = 2.0;
 
-/** Cards use a hairline border; a very soft shadow on iOS only. Android elevation stays 0 (avoids grey shadow boxes). */
+/** Cards use a hairline border; a very soft shadow on iOS only. Android uses elevation 1. */
 export const cardShadow = Platform.select({
-  ios: { shadowColor: '#0F172A', shadowOpacity: 0.04, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } },
-  default: {},
+  ios: { shadowColor: '#3A1FC4', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 4 } },
+  default: { elevation: 1 },
 }) as object;
 
 /** Kept for components copied from the template app. */

@@ -3,11 +3,12 @@ import {
   ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, RefreshControl, ScrollView, StyleProp, StyleSheet, Text,
   TextInput, TextInputProps, TextStyle, View, ViewStyle,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useApp } from '../ctx/AppContext';
-import { C, cardShadow, FONT, FONT_UR, FONT_UR_BOLD, R, Tone, TONES, URDU_LINE } from '../lib/theme';
+import { C, cardShadow, FONT, FONT_UR, FONT_UR_BOLD, GRAD, R, Tone, TONES, URDU_LINE } from '../lib/theme';
 import { CREDIT } from '../lib/brand';
 
 export type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -58,28 +59,32 @@ export function Divider() { return <View style={{ height: StyleSheet.hairlineWid
 // ---------------------------------------------------------------- Buttons
 interface BProps { label?: string; icon?: IconName; onPress?: () => void; variant?: 'primary' | 'ghost' | 'danger'; small?: boolean; block?: boolean; disabled?: boolean; loading?: boolean; style?: StyleProp<ViewStyle> }
 export function Button({ label, icon, onPress, variant = 'primary', small, block, disabled, loading, style }: BProps) {
-  const fg = variant === 'primary' ? '#fff' : variant === 'danger' ? C.danger : C.ink;
-  const bg = variant === 'primary' ? C.primary : variant === 'danger' ? C.dangerSoft : C.card;
-  const border = variant === 'ghost' ? C.line : 'transparent';
+  const fg = variant === 'primary' ? '#fff' : variant === 'danger' ? C.danger : C.primary;
+  const bg = variant === 'danger' ? C.dangerSoft : C.card;
+  const border = variant === 'ghost' ? C.primarySoft : 'transparent';
+  const content = (
+    <Row gap={8} style={{ justifyContent: 'center' }}>
+      {loading ? <ActivityIndicator size="small" color={fg} /> : icon ? <Ionicons name={icon} size={small ? 16 : 19} color={fg} /> : null}
+      {label ? <T bold size={small ? 13 : 15} color={fg} center>{label}</T> : null}
+    </Row>
+  );
+  const pad = { paddingVertical: small ? 8 : 14, paddingHorizontal: small ? 14 : 20 };
   return (
     <Pressable
       disabled={disabled || loading} onPress={onPress} android_ripple={{ color: 'rgba(255,255,255,0.2)' }}
-      style={({ pressed }) => [{
-        backgroundColor: pressed && variant === 'primary' ? C.primaryDark : pressed ? C.subtle : bg, borderColor: border, borderWidth: 1, borderRadius: R.md,
-        paddingVertical: small ? 8 : 13, paddingHorizontal: small ? 14 : 20, opacity: disabled ? 0.45 : 1, ...(block ? { flex: 1 } : {}),
-      }, style]}>
-      <Row gap={8} style={{ justifyContent: 'center' }}>
-        {loading ? <ActivityIndicator size="small" color={fg} /> : icon ? <Ionicons name={icon} size={small ? 16 : 18} color={fg} /> : null}
-        {label ? <T bold size={small ? 13 : 15} color={fg} center>{label}</T> : null}
-      </Row>
+      style={({ pressed }) => [{ borderRadius: R.md + 2, overflow: 'hidden', opacity: disabled ? 0.45 : pressed ? 0.9 : 1, ...(block ? { flex: 1 } : {}) },
+        variant === 'primary' ? cardShadow : { backgroundColor: pressed ? C.subtle : bg, borderColor: border, borderWidth: 1.5 }, style]}>
+      {variant === 'primary'
+        ? <LinearGradient colors={GRAD} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={pad}>{content}</LinearGradient>
+        : <View style={pad}>{content}</View>}
     </Pressable>
   );
 }
 
-export function IconButton({ icon, onPress, color = C.ink, size = 20, style }: { icon: IconName; onPress?: () => void; color?: string; size?: number; style?: StyleProp<ViewStyle> }) {
+export function IconButton({ icon, onPress, color, size = 20, style, glass }: { icon: IconName; onPress?: () => void; color?: string; size?: number; style?: StyleProp<ViewStyle>; glass?: boolean }) {
   return (
-    <Pressable onPress={onPress} hitSlop={6} android_ripple={{ color: C.primarySoft, radius: 22 }} style={({ pressed }) => [styles.iconBtn, pressed && { backgroundColor: C.subtle }, style]}>
-      <Ionicons name={icon} size={size} color={color} />
+    <Pressable onPress={onPress} hitSlop={6} android_ripple={{ color: C.primarySoft, radius: 22 }} style={({ pressed }) => [styles.iconBtn, glass && { backgroundColor: 'rgba(255,255,255,0.18)', borderColor: 'transparent' }, pressed && { opacity: 0.75 }, style]}>
+      <Ionicons name={icon} size={size} color={color || (glass ? '#fff' : C.ink)} />
     </Pressable>
   );
 }
@@ -91,9 +96,11 @@ interface ScreenProps {
 }
 export function Screen({ title, subtitle, back, right, children, scroll = true, onRefresh, padBottom = 40, edges = ['top'] }: ScreenProps) {
   const { rtl } = useApp();
+  const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
   // Tablets: keep content in a readable column instead of stretching edge to edge.
   const column: ViewStyle = { width: '100%', maxWidth: 720, alignSelf: 'center' };
+  const hasHeader = !!(title || back);
   const body = scroll ? (
     <ScrollView
       contentContainerStyle={[{ padding: 16, paddingBottom: padBottom }, column]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}
@@ -102,19 +109,22 @@ export function Screen({ title, subtitle, back, right, children, scroll = true, 
     </ScrollView>
   ) : <View style={[{ flex: 1, padding: 16 }, column]}>{children}</View>;
   return (
-    <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: C.bg }}>
-      {(title || back) && (
-        <Row style={[{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4, minHeight: 56 }, column]} gap={10}>
-          {back ? <IconButton icon={rtl ? 'arrow-forward' : 'arrow-back'} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} /> : null}
-          <View style={{ flex: 1 }}>
-            {subtitle ? <Muted>{subtitle}</Muted> : null}
-            <T size={22} bold numberOfLines={1}>{title}</T>
-          </View>
-          {right}
-        </Row>
+    <View style={{ flex: 1, backgroundColor: C.bg, paddingTop: hasHeader || !edges.includes('top') ? 0 : insets.top }}>
+      {hasHeader && (
+        <LinearGradient colors={GRAD} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
+          <View style={styles.headerCircle} pointerEvents="none" />
+          <Row style={[{ paddingHorizontal: 16, paddingTop: insets.top + 10, minHeight: 56 + insets.top }, column]} gap={10}>
+            {back ? <IconButton glass icon={rtl ? 'arrow-forward' : 'arrow-back'} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} /> : null}
+            <View style={{ flex: 1 }}>
+              {subtitle ? <T size={13} color="rgba(255,255,255,0.8)">{subtitle}</T> : null}
+              <T size={22} bold color="#fff" numberOfLines={1}>{title}</T>
+            </View>
+            {right}
+          </Row>
+        </LinearGradient>
       )}
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>{body}</KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -299,24 +309,28 @@ export function ListItem({ title, sub, sub2, left, trail, onPress, last }: { tit
   return onPress ? <Pressable onPress={onPress} style={({ pressed }) => pressed && { backgroundColor: C.subtle }}>{inner}</Pressable> : inner;
 }
 
-/** Bento tile: small label, large number. `tone` only colours the number when it carries meaning (teal = in, red = due). */
-export function Tile({ label, value, tone, onPress, style }: { label: string; value: string | number; tone?: Tone; onPress?: () => void; style?: StyleProp<ViewStyle> }) {
+/** Stat tile (mockup style): tinted card, round icon chip, small label, large number. */
+export function Tile({ label, value, tone = 'indigo', icon, onPress, style }: { label: string; value: string | number; tone?: Tone; icon?: IconName; onPress?: () => void; style?: StyleProp<ViewStyle> }) {
   const { rtl } = useApp();
+  const c = TONES[tone];
   return (
-    <Card onPress={onPress} style={[{ flexBasis: '47%', flexGrow: 1, marginBottom: 0, alignItems: rtl ? 'flex-end' : 'flex-start' }, style]}>
-      <Muted>{label}</Muted>
-      <T bold size={22} num color={tone ? TONES[tone].fg : C.ink} style={{ marginTop: 6 }} numberOfLines={1}>{String(value)}</T>
+    <Card onPress={onPress} style={[{ flexBasis: '47%', flexGrow: 1, marginBottom: 0, backgroundColor: c.bg, borderColor: 'transparent', elevation: 0, alignItems: rtl ? 'flex-end' : 'flex-start' }, style]}>
+      {icon ? <View style={[styles.round(34), { backgroundColor: c.fg, borderRadius: 11, marginBottom: 10 }]}><Ionicons name={icon} size={18} color="#fff" /></View> : null}
+      <T size={13} color={C.soft}>{label}</T>
+      <T bold size={19} num color={C.ink} style={{ marginTop: 3 }} numberOfLines={1}>{String(value)}</T>
     </Card>
   );
 }
 
 export function Hero({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <View style={styles.hero}>
-      <T size={13} color="rgba(255,255,255,0.75)">{label}</T>
-      <T bold size={34} color="#fff" num style={{ marginTop: 4 }} numberOfLines={1}>{value}</T>
-      {hint ? <T size={12.5} color="rgba(255,255,255,0.7)" style={{ marginTop: 6 }}>{hint}</T> : null}
-    </View>
+    <LinearGradient colors={GRAD} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+      <View style={styles.heroCircleA} pointerEvents="none" />
+      <View style={styles.heroCircleB} pointerEvents="none" />
+      <T size={13.5} color="rgba(255,255,255,0.8)">{label}</T>
+      <T bold size={32} color="#fff" num style={{ marginTop: 4 }} numberOfLines={1}>{value}</T>
+      {hint ? <T size={12.5} color="rgba(255,255,255,0.75)" style={{ marginTop: 6 }}>{hint}</T> : null}
+    </LinearGradient>
   );
 }
 
@@ -325,38 +339,44 @@ export const Grid = ({ children }: { children?: React.ReactNode }) => <View styl
 // ---------------------------------------------------------------- styles
 const styles = {
   card: { backgroundColor: C.card, borderRadius: R.lg, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: C.line, ...cardShadow } as ViewStyle,
-  hero: { backgroundColor: C.primary, borderRadius: R.lg + 2, padding: 20, marginBottom: 12 } as ViewStyle,
-  iconBtn: { width: 38, height: 38, borderRadius: R.md, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' } as ViewStyle,
-  input: { backgroundColor: C.card, borderRadius: R.md, borderWidth: 1, borderColor: C.line, paddingHorizontal: 14, paddingVertical: 11, fontSize: 15, color: C.ink } as TextStyle,
+  hero: { borderRadius: R.lg + 4, padding: 20, marginBottom: 12, overflow: 'hidden' } as ViewStyle,
+  heroCircleA: { position: 'absolute', right: -30, top: -40, width: 150, height: 150, borderRadius: 75, backgroundColor: 'rgba(255,255,255,0.10)' } as ViewStyle,
+  heroCircleB: { position: 'absolute', right: 40, bottom: -50, width: 110, height: 110, borderRadius: 55, backgroundColor: 'rgba(255,255,255,0.07)' } as ViewStyle,
+  header: { borderBottomLeftRadius: 28, borderBottomRightRadius: 28, paddingBottom: 18, overflow: 'hidden' } as ViewStyle,
+  headerCircle: { position: 'absolute', right: -40, top: -60, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(255,255,255,0.08)' } as ViewStyle,
+  iconBtn: { width: 40, height: 40, borderRadius: 13, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' } as ViewStyle,
+  input: { backgroundColor: C.card, borderRadius: R.md + 2, borderWidth: 1, borderColor: C.line, paddingHorizontal: 14, paddingVertical: 11, fontSize: 15, color: C.ink } as TextStyle,
   segmented: { backgroundColor: C.subtle, borderRadius: R.md, padding: 3 } as ViewStyle,
   segBtn: { flex: 1, paddingVertical: 8, borderRadius: R.sm + 1, justifyContent: 'center' } as ViewStyle,
   segActive: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line } as ViewStyle,
   chip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: R.pill, backgroundColor: C.card, borderWidth: 1, borderColor: C.line } as ViewStyle,
-  chipOn: { backgroundColor: C.ink, borderColor: C.ink } as ViewStyle,
-  search: { backgroundColor: C.card, borderRadius: R.md, paddingHorizontal: 14, marginBottom: 12, borderWidth: 1, borderColor: C.line } as ViewStyle,
+  chipOn: { backgroundColor: C.primary, borderColor: C.primary } as ViewStyle,
+  search: { backgroundColor: C.card, borderRadius: R.lg, paddingHorizontal: 14, marginBottom: 12, borderWidth: 1, borderColor: C.line } as ViewStyle,
   check: { width: 22, height: 22, borderRadius: 7, borderWidth: 1.5, borderColor: '#CBD5E1', alignItems: 'center', justifyContent: 'center' } as ViewStyle,
   overlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.4)' } as ViewStyle,
   sheetWrap: { position: 'absolute', left: 0, right: 0, bottom: 0, alignItems: 'center' } as ViewStyle,
-  sheet: { width: '100%', maxWidth: 560, backgroundColor: C.bg, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 18, paddingTop: 10 } as ViewStyle,
+  sheet: { width: '100%', maxWidth: 560, backgroundColor: C.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 18, paddingTop: 10 } as ViewStyle,
   grabber: { alignSelf: 'center', width: 36, height: 4, borderRadius: 2, backgroundColor: '#CBD5E1', marginBottom: 12 } as ViewStyle,
   round: (s: number): ViewStyle => ({ width: s, height: s, borderRadius: s / 2, alignItems: 'center', justifyContent: 'center' }),
 };
 
 // ---------------------------------------------------------------- Full-screen modal (long forms opened from a list)
 export function FullModal({ visible, title, onClose, children, footer }: { visible: boolean; title: string; onClose: () => void; children?: React.ReactNode; footer?: React.ReactNode }) {
-  const { rtl } = useApp();
+  const insets = useSafeAreaInsets();
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
-        <Row style={{ paddingHorizontal: 16, paddingVertical: 10 }} gap={10}>
-          <IconButton icon="close" onPress={onClose} />
-          <T size={19} bold style={{ flex: 1 }} numberOfLines={1}>{title}</T>
-        </Row>
+      <View style={{ flex: 1, backgroundColor: C.bg }}>
+        <LinearGradient colors={GRAD} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
+          <Row style={{ paddingHorizontal: 16, paddingTop: insets.top + 10, minHeight: 56 + insets.top }} gap={10}>
+            <IconButton glass icon="close" onPress={onClose} />
+            <T size={19} bold color="#fff" style={{ flex: 1 }} numberOfLines={1}>{title}</T>
+          </Row>
+        </LinearGradient>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 30, width: '100%', maxWidth: 720, alignSelf: 'center' }} keyboardShouldPersistTaps="handled">{children}</ScrollView>
           {footer ? <View style={{ padding: 16, borderTopWidth: 1, borderTopColor: C.line, backgroundColor: C.card }}>{footer}</View> : null}
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }

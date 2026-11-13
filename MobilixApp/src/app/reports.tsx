@@ -32,10 +32,10 @@ export default function Reports() {
       {!r ? <Loading /> : (
         <>
           <Grid>
-            <Tile label={t('salesTotal')} value={money(r.salesTotal)} />
-            <Tile label={t('profit')} value={money(r.profit)} tone={r.profit > 0 ? 'teal' : r.profit < 0 ? 'red' : undefined} />
-            <Tile label={t('expenses')} value={money(r.expenses)} />
-            <Tile label={t('netProfit')} value={money(r.net)} tone={r.net > 0 ? 'teal' : r.net < 0 ? 'red' : undefined} />
+            <Tile icon="cart" tone="teal" label={t('salesTotal')} value={money(r.salesTotal)} />
+            <Tile icon="trending-up" tone={r.profit < 0 ? 'red' : 'amber'} label={t('profit')} value={money(r.profit)} />
+            <Tile icon="remove-circle" tone="red" label={t('expenses')} value={money(r.expenses)} />
+            <Tile icon="wallet" tone={r.net < 0 ? 'red' : 'indigo'} label={t('netProfit')} value={money(r.net)} />
           </Grid>
           <Card flush style={{ marginTop: 12 }}>
             <KV k={t('salesCount')} v={String(r.salesCount)} />
