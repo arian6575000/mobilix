@@ -4,7 +4,7 @@
 //   Get it from the License Generator app: Projects > add "mobilix" > Keys, then paste the public key below
 //   (or run `node tools/make-project.mjs` on your own computer; it writes it for you).
 export const PROJECT_CODE = "mobilix";
-export const PUBLIC_KEY_HEX = "";
+export const PUBLIC_KEY_HEX = "f9ba6f072f0986cb45a7d794c84a507385fc346cc5914cfd4b1c496fa4d7ff0f";
 // =======================================
 // DEVICE_PREFIX: app name at the start of the Device ID ("Mobilix-87A9-F285-E2DF"); unique per app so licenses never cross apps.
 export const DEVICE_PREFIX = "Mobilix";
